@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+<head>
+    <title>Reading</title>
+    <style>
+        html, body {
+            background: #eee;
+            font-family: sans-serif;
+        }
+        #title {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 300px;
+            background: #43A047;
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+        #main_ctr {
+            position: relative;
+            margin-top: 200px;
+            width: 40%;
+            min-width: 800px;
+            background: white;
+            border-radius: 2px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.54);
+            overflow: hidden;
+            text-align: center;
+        }
+        #hp_bar {
+            height: 10px;
+            background: #E0E0E0;
+        }
+        #hp_bar > #hp_bar_current {
+            width: 100%;
+            height: 10px;
+            background: #00E676;
+        }
+        #kanji_text {
+            margin-top: 48px;
+            margin-bottom: 48px;
+            font-size: 24px;
+        }
+        #input_title {
+            display: block;
+            color: gray;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+        #input_ctr {
+        }
+        #input {
+            border: none;
+            background: none;
+            width: 80%;
+            outline: none;
+            font-size: 24px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            text-align: center;
+            border-bottom: 2px solid #E0E0E0;
+        }
+        #input:focus {
+            border-bottom: 2px solid #00E676;
+        }
+        #progress_text {
+            margin-top: 32px;
+            margin-bottom: 32px;
+            color: gray;
+            font-size: 12px;
+        }
+        #input_stage, #post_input_stage, #result_stage {
+            display: none;
+        }
+        #post_text {
+            font-size: 24px;
+            margin-top: 24px;
+            margin-bottom: 24px;
+            color: #00C853;
+        }
+        .invalid #post_text {
+            color: #DD2C00;
+        }
+        #post_sentence_japanese {
+            font-size: 20px;
+        }
+        #post_sentence_english {
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
+        .press_enter_hint {
+            color: #00C853;
+            font-size: 12px;
+        }
+        .invalid .press_enter_hint {
+            color: #DD2C00;
+        }
+        #post_sentence_you_said_ctr {
+            margin-bottom: 12px;
+        }
+        .added, .correct {
+            color: #00C853;
+        }
+        .removed, .incorrect {
+            color: #DD2C00;
+        }
+        .blue {
+            color: #0091EA;
+        }
+        #result_text {
+            font-size: 24px;
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
+        #result_table {
+            display: inline-block;
+        }
+        #result_table .header {
+            text-align: left;
+            width: 200px;
+        }
+        #credit {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            color: gray;
+            font-size: 12px;
+            text-align: center;
+            padding-bottom: 12px;
+        }
+        a {
+            color: #00C853;
+        }
+    </style>
+</head>
+<body>
+<div id="title">
+
+</div>
+<div id="main_ctr">
+    <div id="input_stage">
+        <div id="kanji_text"></div>
+        <label id="input_title" for="input">Enter the text visible above</label>
+        <div id="input_ctr"><input type="text" id="input"></div>
+    </div>
+    <div id="post_input_stage">
+        <div id="post_text">Unknown Answer</div>
+        <div id="post_sentence_japanese"></div>
+        <div id="post_sentence_english"></div>
+        <div id="post_sentence_you_said_ctr">You said: <span id="post_sentence_you_said"></span></div>
+        <div class="press_enter_hint">Press enter to continue</div>
+    </div>
+    <div id="result_stage">
+        <div id="result_text">Game complete</div>
+        <table id="result_table">
+            <tr class="correct">
+                <td class="header">Correct</td>
+                <td id="result_correct_count"></td>
+            </tr>
+            <tr class="incorrect">
+                <td class="header">Incorrect</td>
+                <td id="result_incorrect_count"></td>
+            </tr>
+            <tr class="blue">
+                <td class="header">Total</td>
+                <td id="result_total_count"></td>
+            </tr>
+        </table>
+    </div>
+    <div id="progress_text">Loading the game</div>
+</div>
+<div id="credit">
+    Program written by <a href="https://mrarm.io">MrARM</a>.
+    Sentences from the <a href="https://tatoeba.org">Tatoeba project</a>, project uses <a href="https://www.npmjs.com/package/diff">Diff</a>.
+</div>
+<script src="diff.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
