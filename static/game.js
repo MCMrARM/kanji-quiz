@@ -376,10 +376,3 @@ class Game {
     }
 
 }
-
-let game = null;
-let gameData = new GameData();
-gameData.load("/api/sentences", () => {
-    game = new Game(gameData);
-    game.start();
-});

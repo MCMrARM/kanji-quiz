@@ -110,7 +110,7 @@
         .blue {
             color: #0091EA;
         }
-        #result_text {
+        #result_text, #options_title {
             font-size: 24px;
             margin-top: 24px;
             margin-bottom: 24px;
@@ -132,6 +132,57 @@
             text-align: center;
             padding-bottom: 12px;
         }
+        .kanji_list {
+            display: flex;
+            flex-direction: row;
+            margin: 4px 16px;
+            border: 1px solid rgba(0, 0, 0, 0.54);
+            border-radius: 4px;
+        }
+        .kanji_list > .groups {
+            width: 400px;
+            padding: 8px 0;
+            margin: 0;
+            list-style: none;
+            border-right: 1px solid rgba(0, 0, 0, 0.54);
+        }
+        .kanji_list > .groups li {
+            padding: 8px;
+        }
+        .kanji_list > .groups .selected {
+            background: #b9f6ca;
+            color: #009624;
+            font-weight: bold;
+        }
+        .kanji_list > .items {
+            height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            padding: 0 8px 8px;
+            user-select: none;
+        }
+        .kanji_list > .items .item {
+            cursor: pointer;
+        }
+        .kanji_list > .items .item.selected {
+            background: #b9f6ca;
+        }
+        .kanji_list h5 {
+            padding: 0;
+            color: #00c853;
+            font-weight: bold;
+            margin: 8px 0 0;
+            cursor: pointer;
+        }
+        #options_start {
+            display: inline-block;
+            background: #00c853;
+            color: white;
+            padding: 4px 32px;
+            border-radius: 2px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
         a {
             color: #00C853;
         }
@@ -142,6 +193,12 @@
 
 </div>
 <div id="main_ctr">
+    <div id="options_stage">
+        <div id="options_title">Kanji Reading Quiz</div>
+        <p>Select the Kanji you would like in your Quiz:</p>
+        <div id="options_kanji_list" class="kanji_list"></div>
+        <span id="options_start">始めよう！</span>
+    </div>
     <div id="input_stage">
         <div id="kanji_text"></div>
         <label id="input_title" for="input">Enter the text visible above</label>
@@ -179,5 +236,6 @@
 </div>
 <script src="diff.js"></script>
 <script src="game.js"></script>
+<script src="options.js"></script>
 </body>
 </html>

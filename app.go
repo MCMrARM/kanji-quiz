@@ -3,12 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
+	"math"
 	"math/rand"
 	"net/http"
-	"os"
+	"runtime"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -16,32 +19,87 @@ type Sentence struct {
 	Jp string `json:"jp"`
 	JpScript string `json:"jp_script"`
 	En string `json:"en"`
+	Json []byte `json:"-"`
+	Compounds []uint16 `json:"-"`
 }
 
-func loadSentences() []Sentence {
+func loadKanjiMap() (map[rune]uint16, int) {
+	bytes, err := ioutil.ReadFile("data/kanji_list.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	str := string(bytes)
+	str = strings.ReplaceAll(str, "\n", "")
+	ret := make(map[rune]uint16)
+	for idx, r := range str {
+		ret[r] = uint16(idx)
+	}
+	return ret, len(str)
+}
+
+func loadSentences(kanjiMap map[rune]uint16) []Sentence {
 	var sentences []Sentence
 
-	file, err := os.Open("data/sentences.json")
+	bytes, err := ioutil.ReadFile("data/sentences.json")
 	if err != nil {
-		panic(err)
-	}
-	bytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	json.Unmarshal(bytes, &sentences)
-	_ = file.Close()
 
-	return sentences
+	// build compounds
+	compounds := make([]uint16, 0)
+	compoundsI := 0
+	for i, s := range sentences {
+		inBrackets := false
+		addedAnyChar := false
+		for _, c := range s.Jp {
+			if c == '[' {
+				inBrackets = true
+				addedAnyChar = false
+			} else if c == ']' && inBrackets {
+				inBrackets = false
+				if addedAnyChar {
+					compounds = append(compounds, 0)
+				}
+			} else if inBrackets {
+				kanjiId, kanjiOk := kanjiMap[c]
+				if kanjiOk {
+					compounds = append(compounds, kanjiId)
+					addedAnyChar = true
+				}
+			}
+		}
+		sentences[i].Compounds = compounds[compoundsI:len(compounds)]
+		compoundsI = len(compounds)
+	}
+	fmt.Printf("compound array size: %d", len(compounds))
+
+	// cache jsons, free fields
+	filteredSentences := make([]Sentence, 0)
+	for _, s := range sentences {
+		if len(s.Compounds) == 0 {
+			continue
+		}
+		s.Json, _ = json.Marshal(s)
+		s.Jp = ""
+		s.JpScript = ""
+		s.En = ""
+		filteredSentences = append(filteredSentences, s)
+	}
+	sentences = make([]Sentence, 0)
+
+	runtime.GC()
+	return filteredSentences
 }
 
-var sentences = loadSentences()
+var kanjiList, kanjiMaxNo = loadKanjiMap()
+var sentences = loadSentences(kanjiList)
 
 func sampleSentences(list []*Sentence, n int) []*Sentence {
 	if len(list) < n {
 		return list
 	}
-	result := make([]*Sentence, 0, 5)
+	result := make([]*Sentence, 0, n)
 
 	set := make(map[int]bool)
 	for len(result) < n {
@@ -55,9 +113,53 @@ func sampleSentences(list []*Sentence, n int) []*Sentence {
 }
 
 func getSentences(w http.ResponseWriter, r *http.Request) {
+	onlyCount := false
+	if r.FormValue("only_count") == "1" {
+		onlyCount = true
+	}
+
+	understoodKanji := make([]bool, kanjiMaxNo)
+	understoodKanjiForm := r.FormValue("kanji")
+	for _, c := range understoodKanjiForm {
+		if c > math.MaxUint16 {
+			continue
+		}
+		kanjiId, kanjiOk := kanjiList[c]
+		if !kanjiOk {
+			continue
+		}
+		understoodKanji[kanjiId] = true
+	}
+
+	understandPMin := 1.0
+
 	filtered := make([]*Sentence, 0)
-	for s := range sentences {
-		filtered = append(filtered, &sentences[s])
+	filteredCount := 0
+	for i, s := range sentences {
+		compoundUnderstood := true
+		understoodCompounds, totalCompounds := 0, 0
+		for _, c := range s.Compounds {
+			if c == 0 {
+				if compoundUnderstood {
+					understoodCompounds += 1
+				}
+				totalCompounds += 1
+				compoundUnderstood = true
+			} else if !understoodKanji[c] {
+				compoundUnderstood = false
+			}
+		}
+		if float64(understoodCompounds) / float64(totalCompounds) < understandPMin {
+			continue
+		}
+		filteredCount += 1
+		if !onlyCount {
+			filtered = append(filtered, &sentences[i])
+		}
+	}
+	if onlyCount {
+		fmt.Fprintf(w, "%d", filteredCount)
+		return
 	}
 
 	count, err := strconv.ParseUint(r.FormValue("count")[0:], 10, 32)
@@ -68,12 +170,14 @@ func getSentences(w http.ResponseWriter, r *http.Request) {
 		count = 100
 	}
 
-	out, err := json.Marshal(sampleSentences(filtered, int(count)))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	io.WriteString(w, "[")
+	for i, s := range sampleSentences(filtered, int(count)) {
+		if i != 0 {
+			io.WriteString(w, ",")
+		}
+		w.Write(s.Json)
 	}
-	fmt.Fprintf(w, "%s", string(out))
+	io.WriteString(w, "]")
 }
 
 func timer(h http.Handler) http.Handler {
@@ -88,6 +192,9 @@ func timer(h http.Handler) http.Handler {
 func main() {
 	static := http.FileServer(http.Dir("./static"))
 	http.Handle("/", static)
+	http.HandleFunc("/api/kanji-groups", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "data/kanji_groups.json")
+	})
 	http.Handle("/api/sentences", timer(http.HandlerFunc(getSentences)))
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
