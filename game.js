@@ -36,16 +36,16 @@ class GameData {
                 }
             }
             info["jp_basic"] = basicReading;
-            info["jp_kana"] = this.deleteHiragana(kanaReading);
+            info["jp_kana"] = this.deleteKatakana(kanaReading);
             info["jp_parsed"] = readingArray;
         }
         return info;
     }
 
-    deleteHiragana(str) {
-        let katakanaRegex = /[アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン]/g;
-        let hiragana = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん";
-        let katakana = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+    deleteKatakana(str) {
+        let katakanaRegex = /[アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンャョュ]/g;
+        let hiragana = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんゃょゅ";
+        let katakana = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンャョュ";
         return str.replace(katakanaRegex, (c) =>  {
             return hiragana.charAt(katakana.indexOf(c));
         });
@@ -65,34 +65,45 @@ class KanaIme {
 
     isLatin(char) {
         let cc = char.charCodeAt(0);
-        return ((cc >= 97 && cc <= 122) || char === "." || char === "[" || char === "]" || char === " ");
+        return ((cc >= 97 && cc <= 122) || char === "." || char === "[" || char === "]" || char === " " ||
+            char === "," || char === "!" || char === "?");
     }
 
     makeReplacementFor(txt) {
-        if (txt.length > 1 && (txt.charAt(0) === txt.charAt(1) || (txt.charAt(0) === "ん" && txt.charAt(1) === "n")))
+        if (txt.length > 1 && txt.charAt(0) === txt.charAt(1))
             return ["っ", 1];
 
         let specialMapTable = {
             "shi": "し",
             "tsu": "つ",
             "chi": "ち",
-            "cha": "ちゃ",
-            "cho": "ちょ",
-            "chu": "ちゅ",
-            "sha": "しゃ",
-            "sho": "しょ",
-            "shu": "しゅ",
-            "jya": "じゃ",
-            "jyo": "じょ",
-            "jyu": "じゅ",
-            "ja": "じゃ",
-            "jo": "じょ",
-            "ju": "じゅ",
             "ji": "じ",
+            "fu": "ふ",
             "[": "「",
             "]": "」",
             ".": "。",
+            ",": "、",
+            "?": "？",
+            "!": "！",
         };
+        function makeSmallLetterMappings(base, jpBase) {
+            specialMapTable[base + "a"] = jpBase + "ゃ";
+            specialMapTable[base + "u"] = jpBase + "ゅ";
+            specialMapTable[base + "o"] = jpBase + "ょ";
+        }
+        makeSmallLetterMappings("j", "じ");
+        makeSmallLetterMappings("jy", "じ");
+        makeSmallLetterMappings("ky", "き");
+        makeSmallLetterMappings("gy", "ぎ");
+        makeSmallLetterMappings("sh", "し");
+        makeSmallLetterMappings("ch", "ち");
+        makeSmallLetterMappings("ny", "に");
+        makeSmallLetterMappings("んy", "に");
+        makeSmallLetterMappings("hy", "ひ");
+        makeSmallLetterMappings("by", "び");
+        makeSmallLetterMappings("py", "ぴ");
+        makeSmallLetterMappings("my", "み");
+        makeSmallLetterMappings("ry", "り");
         if (specialMapTable.hasOwnProperty(txt.substr(0, 1)))
             return [specialMapTable[txt.substr(0, 1)], 1];
         if (specialMapTable.hasOwnProperty(txt.substr(0, 2)))
@@ -174,7 +185,7 @@ class KanaIme {
         }
         if (s > 0 && v.charAt(s - 1) === 'ん') {
             let repl = this.makeReplacementFor(v.substr(s - 1, 3));
-            if (repl !== null && repl[1] === 2)
+            if (repl !== null)
                 s = replace(s - 1, s + 1, repl[0]);
         }
         while (s < se) {
@@ -273,8 +284,8 @@ class Game {
 
         this.domPostSentenceEnglish.innerText = this.challengeSentence["en"];
 
-        let userInput = this.domInput.value.replace("。", "").replace("\\", "");
-        let expectedInput = this.challengeSentence["jp_kana"].replace("。", "").replace("？", "").replace("!", "");
+        let userInput = this.domInput.value.replace("。", "").replace("？", "").replace("！", "").replace("、", "").replace("\\", "");
+        let expectedInput = this.challengeSentence["jp_kana"].replace("。", "").replace("？", "").replace("！", "").replace("、", "");
         if (userInput === expectedInput) {
             if (!this.challengeAlreadyIncorrect)
                 this.challengeCorrectNumber += 1;
