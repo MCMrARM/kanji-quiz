@@ -379,7 +379,7 @@ class Game {
 
 let game = null;
 let gameData = new GameData();
-gameData.load("data/sentences_test.json", () => {
+gameData.load("/api/sentences", () => {
     game = new Game(gameData);
     game.start();
 });
