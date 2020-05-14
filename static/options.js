@@ -139,7 +139,7 @@ class App {
 
     load() {
         this.domProgressText.innerText = "Loading Kanji list...";
-        this.kanjiPickerData.load("/api/kanji-groups", () => {
+        this.kanjiPickerData.load("api/kanji-groups", () => {
             this.kanjiPicker = new KanjiPicker(this.domKanjiPicker, this.kanjiPickerData, () => {
                 this.onKanjiListUpdated();
             });
@@ -150,7 +150,7 @@ class App {
     startGame() {
         if (this.kanjiPicker === null)
             return;
-        let url = "/api/sentences?count=20&kanji=" + Array.from(this.kanjiPicker.selection).join("");
+        let url = "api/sentences?count=20&kanji=" + Array.from(this.kanjiPicker.selection).join("");
 
         this.domOptionsStage.style.display = "none";
         this.domProgressText.innerText = "Getting sentences from the server...";
@@ -172,7 +172,7 @@ class App {
         }
         this.domProgressText.innerText = "Available sentences: Calculating...";
         this.kanjiCalculateTimer = setTimeout(() => {
-            let url = "/api/sentences?only_count=1&kanji=" + Array.from(this.kanjiPicker.selection).join("");
+            let url = "api/sentences?only_count=1&kanji=" + Array.from(this.kanjiPicker.selection).join("");
             fetch(url).then((r) => r.text()).then((r) => {
                 if (this.gameData !== null)
                     return;
