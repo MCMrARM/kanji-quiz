@@ -119,39 +119,27 @@ class KanaIme {
         if (iof !== -1)
             return [monographsJp[iof], 1];
 
+        let monographsJpArr = {
+            "n": "なにぬねの",
+            "ん": "なにぬねの",
+            "k": "かきくけこ",
+            "g": "がぎぐげご",
+            "s": "さしすせそ",
+            "z": "ざじずぜぞ",
+            "t": "たちつてと",
+            "d": "だぢづでど",
+            "h": "はひふへほ",
+            "b": "ばびぶべぼ",
+            "p": "ぱぴぷぺぽ",
+            "m": "まみむめも",
+            "y": "や-ゆ-よ",
+            "r": "らりるれろ",
+            "w": "わ---を",
+            " ": "あいうえお"
+        };
         monographsJp = null;
-        if (txt.charAt(0) === "n" || txt.charAt(0) === "ん") {
-            monographsJp = "なにぬねの";
-        } else if (txt.charAt(0) === "k") {
-            monographsJp = "かきくけこ";
-        } else if (txt.charAt(0) === "g") {
-            monographsJp = "がぎぐげご";
-        } else if (txt.charAt(0) === "s") {
-            monographsJp = "さしすせそ";
-        } else if (txt.charAt(0) === "z") {
-            monographsJp = "ざじずぜぞ";
-        } else if (txt.charAt(0) === "t") {
-            monographsJp = "たちつてと";
-        } else if (txt.charAt(0) === "d") {
-            monographsJp = "だぢづでど";
-        } else if (txt.charAt(0) === "n") {
-            monographsJp = "なにぬねの";
-        } else if (txt.charAt(0) === "h") {
-            monographsJp = "はひふへほ";
-        } else if (txt.charAt(0) === "b") {
-            monographsJp = "ばびぶべぼ";
-        } else if (txt.charAt(0) === "p") {
-            monographsJp = "ぱぴぷぺぽ";
-        } else if (txt.charAt(0) === "m") {
-            monographsJp = "まみむめも";
-        } else if (txt.charAt(0) === "y") {
-            monographsJp = "や-ゆ-よ";
-        } else if (txt.charAt(0) === "r") {
-            monographsJp = "らりるれろ";
-        } else if (txt.charAt(0) === "w") {
-            monographsJp = "わ---を";
-        } else if (txt.charAt(0) === " ") {
-            monographsJp = "あいうえお";
+        if (txt.charAt(0) in monographsJpArr) {
+            monographsJp = monographsJpArr[txt.charAt(0)];
         }
         let monograph = null;
         if (monographsJp !== null && txt.length > 1) {
