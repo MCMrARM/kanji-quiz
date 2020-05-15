@@ -205,7 +205,7 @@ class App {
     load() {
         this.domProgressText.innerText = "Loading Kanji list...";
         this.kanjiPickerData.load("api/kanji-groups", () => {
-            let savedKanji = localStorage["optionsKanji"] || "一二三四五六七八九十";
+            let savedKanji = localStorage["optionsKanji"] || "一二三四五六七八九十百千上下左右中大小月日年早木林山川土空田天生花草虫犬人名女男子目耳口手足見音力気円入出立休先夕本文字学校村町森正水火玉王石竹糸貝車金雨赤青白";
             this.kanjiPicker = new KanjiPicker(this.domKanjiPicker, this.kanjiPickerData, savedKanji, () => {
                 this.onKanjiListUpdated();
             });
