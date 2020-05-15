@@ -111,10 +111,10 @@ class KanjiPicker {
 
     onKanjiClicked(dom, ev) {
         if (dom.classList.contains("selected")) {
-            this.selection.add(dom.textContent);
+            this.selection.delete(dom.textContent);
             dom.classList.remove("selected");
         } else {
-            this.selection.delete(dom.textContent);
+            this.selection.add(dom.textContent);
             dom.classList.add("selected");
         }
         this.onKanjiListUpdated();
