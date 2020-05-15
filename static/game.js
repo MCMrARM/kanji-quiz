@@ -66,7 +66,7 @@ class KanaIme {
     isLatin(char) {
         let cc = char.charCodeAt(0);
         return ((cc >= 97 && cc <= 122) || char === "." || char === "[" || char === "]" || char === " " ||
-            char === "," || char === "!" || char === "?");
+            char === "," || char === "!" || char === "?" || char === "-");
     }
 
     makeReplacementFor(txt) {
