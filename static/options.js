@@ -42,11 +42,25 @@ class KanjiPicker {
             if (firstGroupLi === null)
                 firstGroupLi = li;
         }
+        {
+            let li = document.createElement("li");
+            li.group = null;
+            li.textContent = "Custom";
+            ul.appendChild(li);
+            li.addEventListener("click", () => this.setGroup(li));
+            if (firstGroupLi === null)
+                firstGroupLi = li;
+        }
         dom.appendChild(ul);
 
         this.domItems = document.createElement("div");
         this.domItems.classList.add("items");
         dom.appendChild(this.domItems);
+
+        this.domCustomText = document.createElement("textarea");
+        this.domCustomText.classList.add("custom-text");
+        dom.appendChild(this.domCustomText);
+        this.domCustomText.addEventListener("input", () => this.applyFromTextArea());
 
         this.setGroup(firstGroupLi);
     }
@@ -57,12 +71,23 @@ class KanjiPicker {
 
     setGroup(el) {
         let self = this;
+        this.applyFromTextArea();
         if (this.domSelectedGroup !== null)
             this.domSelectedGroup.classList.remove("selected");
         this.domSelectedGroup = el;
         el.classList.add("selected");
+        this.domCustomText.style.display = "none";
+        this.domCustomText.value = "";
+        this.domItems.style.display = "block";
         this.domItems.textContent = "";
-        console.log(el.group);
+
+        if (el.group === null) {
+            this.domCustomText.style.display = "block";
+            this.domItems.style.display = "none";
+            this.domCustomText.value = this.getSelectedString();
+            return;
+        }
+
         for (let s of el.group["subcategories"]) {
             let header = document.createElement("h5");
             header.textContent = s["name"];
@@ -116,6 +141,17 @@ class KanjiPicker {
             }
         }
         this.onKanjiListUpdated();
+    }
+
+    applyFromTextArea() {
+        if (this.domSelectedGroup !== null && this.domSelectedGroup.group === null) {
+            if (this.domCustomText.value === this.getSelectedString())
+                return;
+            this.selection.clear();
+            for (let c of this.domCustomText.value)
+                this.selection.add(c);
+            this.onKanjiListUpdated();
+        }
     }
 
     onKanjiListUpdated() {

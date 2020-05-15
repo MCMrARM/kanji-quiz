@@ -156,17 +156,30 @@
             font-weight: bold;
         }
         .kanji_list > .items {
+            position: relative;
             height: 300px;
             overflow-y: auto;
             text-align: left;
             padding: 0 8px 8px;
             user-select: none;
+            flex-grow: 1;
+            box-sizing: border-box;
         }
         .kanji_list > .items .item {
             cursor: pointer;
         }
         .kanji_list > .items .item.selected {
             background: #b9f6ca;
+        }
+        .kanji_list > .custom-text {
+            height: 300px;
+            display: block;
+            border: none;
+            outline: none;
+            resize: none;
+            flex-grow: 1;
+            padding: 8px 8px;
+            box-sizing: border-box;
         }
         .kanji_list h5 {
             padding: 0;
