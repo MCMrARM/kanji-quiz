@@ -228,7 +228,7 @@ class Game {
 
         document.addEventListener("keyup", (ev) => {
             if (ev.code === "Enter") {
-                this.onDocumentEnterPressed();
+                this.onDocumentEnterPressed(ev);
             }
         }, true);
     }
@@ -267,6 +267,9 @@ class Game {
     }
 
     finishChallenge() {
+        if (this.domInputStage.style.display !== "block")
+            return;
+
         this.domPostSentenceJapanese.innerText = "";
         this.domPostSentenceJapanese.appendChild(this.createFuriganaFor(this.challengeSentence, null));
 
@@ -323,11 +326,12 @@ class Game {
             this.domProgressText.innerText = "Thank you for playing";
     }
 
-    onDocumentEnterPressed() {
+    onDocumentEnterPressed(ev) {
         if (this.domResultStage.style.display === "block" && this.challengeFailed.length > 0) {
             this.challengePending = this.challengeFailed;
             this.challengeCount = this.challengePending.length;
             this.start();
+            ev.stopPropagation();
         }
         if (this.domPostInputStage.style.display === "block") {
             if (this.domPostInputStage.classList.contains("invalid")) {
@@ -339,6 +343,7 @@ class Game {
             } else {
                 this.nextChallenge();
             }
+            ev.stopPropagation();
         }
     }
 
