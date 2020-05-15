@@ -228,8 +228,11 @@ class Game {
 
         document.addEventListener("keyup", (ev) => {
             if (ev.code === "Enter") {
-                this.onDocumentEnterPressed(ev);
+                this.onContinueAction(ev, false);
             }
+        }, true);
+        document.addEventListener("touchend", (ev) => {
+            this.onContinueAction(ev, true);
         }, true);
     }
 
@@ -326,8 +329,8 @@ class Game {
             this.domProgressText.innerText = "Thank you for playing";
     }
 
-    onDocumentEnterPressed(ev) {
-        if (this.domResultStage.style.display === "block" && this.challengeFailed.length > 0) {
+    onContinueAction(ev, fromTouch) {
+        if (this.domResultStage.style.display === "block" && this.challengeFailed.length > 0 && !fromTouch) {
             this.challengePending = this.challengeFailed;
             this.challengeCount = this.challengePending.length;
             this.start();
