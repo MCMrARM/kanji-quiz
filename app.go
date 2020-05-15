@@ -59,7 +59,7 @@ func loadSentences(kanjiMap map[rune]uint16) []Sentence {
 			} else if c == ']' && inBrackets {
 				inBrackets = false
 				if addedAnyChar {
-					compounds = append(compounds, 0)
+					compounds = append(compounds, math.MaxUint16)
 				}
 			} else if inBrackets {
 				kanjiId, kanjiOk := kanjiMap[c]
@@ -139,7 +139,7 @@ func getSentences(w http.ResponseWriter, r *http.Request) {
 		compoundUnderstood := true
 		understoodCompounds, totalCompounds := 0, 0
 		for _, c := range s.Compounds {
-			if c == 0 {
+			if c == math.MaxUint16 {
 				if compoundUnderstood {
 					understoodCompounds += 1
 				}
