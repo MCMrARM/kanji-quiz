@@ -24,6 +24,8 @@ class KanjiPicker {
     constructor(dom, data, initialSelection, callback) {
         this.dom = dom;
         this.domSelectedGroup = null;
+        this.domKanjiList = [];
+        this.lastElementIndexClicked = 0;
         this.selection = new Set();
         for (let c of initialSelection)
             this.selection.add(c);
@@ -80,6 +82,7 @@ class KanjiPicker {
         this.domCustomText.value = "";
         this.domItems.style.display = "block";
         this.domItems.textContent = "";
+        this.domKanjiList = [];
 
         if (el.group === null) {
             this.domCustomText.style.display = "block";
@@ -96,6 +99,7 @@ class KanjiPicker {
             let domKanjiList = [];
             for (let i of s["kanji"]) {
                 let itm = document.createElement("span");
+                itm.kanjiIndex = this.domKanjiList.length;
                 itm.textContent = i;
                 itm.classList.add("item");
                 if (this.selection.has(i))
@@ -103,6 +107,7 @@ class KanjiPicker {
                 itm.addEventListener("click", function(ev) { self.onKanjiClicked(this, ev); });
                 this.domItems.append(itm);
                 domKanjiList.push(itm);
+                this.domKanjiList.push(itm);
             }
 
             header.addEventListener("click", () => this.onKanjiHeaderClicked(domKanjiList));
@@ -110,6 +115,24 @@ class KanjiPicker {
     }
 
     onKanjiClicked(dom, ev) {
+        if (ev.shiftKey) {
+            let i = Math.min(this.lastElementIndexClicked, dom.kanjiIndex);
+            let j = Math.max(this.lastElementIndexClicked, dom.kanjiIndex);
+            let s = dom.classList.contains("selected");
+            for (let k = i; k <= j; k++) {
+                dom = this.domKanjiList[k];
+                if (s) {
+                    this.selection.delete(dom.textContent);
+                    dom.classList.remove("selected");
+                } else {
+                    this.selection.add(dom.textContent);
+                    dom.classList.add("selected");
+                }
+            }
+            this.onKanjiListUpdated();
+            return;
+        }
+
         if (dom.classList.contains("selected")) {
             this.selection.delete(dom.textContent);
             dom.classList.remove("selected");
@@ -117,6 +140,7 @@ class KanjiPicker {
             this.selection.add(dom.textContent);
             dom.classList.add("selected");
         }
+        this.lastElementIndexClicked = dom.kanjiIndex;
         this.onKanjiListUpdated();
     }
 
