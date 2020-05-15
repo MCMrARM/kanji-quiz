@@ -21,11 +21,11 @@ class KanjiPickerData {
 
 class KanjiPicker {
 
-    constructor(dom, data, callback) {
+    constructor(dom, data, initialSelection, callback) {
         this.dom = dom;
         this.domSelectedGroup = null;
         this.selection = new Set();
-        for (let c of "一二三四五六七八九十")
+        for (let c of initialSelection)
             this.selection.add(c);
         this.updateCallback = callback;
 
@@ -48,6 +48,10 @@ class KanjiPicker {
         dom.appendChild(this.domItems);
 
         this.setGroup(firstGroupLi);
+    }
+
+    getSelectedString() {
+        return Array.from(this.selection).join("");
     }
 
     setGroup(el) {
@@ -140,7 +144,8 @@ class App {
     load() {
         this.domProgressText.innerText = "Loading Kanji list...";
         this.kanjiPickerData.load("api/kanji-groups", () => {
-            this.kanjiPicker = new KanjiPicker(this.domKanjiPicker, this.kanjiPickerData, () => {
+            let savedKanji = localStorage["optionsKanji"] || "一二三四五六七八九十";
+            this.kanjiPicker = new KanjiPicker(this.domKanjiPicker, this.kanjiPickerData, savedKanji, () => {
                 this.onKanjiListUpdated();
             });
             this.onKanjiListUpdated();
@@ -150,7 +155,8 @@ class App {
     startGame() {
         if (this.kanjiPicker === null)
             return;
-        let url = "api/sentences?count=20&kanji=" + Array.from(this.kanjiPicker.selection).join("");
+        localStorage["optionsKanji"] = this.kanjiPicker.getSelectedString();
+        let url = "api/sentences?count=20&kanji=" + this.kanjiPicker.getSelectedString();
 
         this.domOptionsStage.style.display = "none";
         this.domProgressText.innerText = "Getting sentences from the server...";
@@ -172,7 +178,7 @@ class App {
         }
         this.domProgressText.innerText = "Available sentences: Calculating...";
         this.kanjiCalculateTimer = setTimeout(() => {
-            let url = "api/sentences?only_count=1&kanji=" + Array.from(this.kanjiPicker.selection).join("");
+            let url = "api/sentences?only_count=1&kanji=" + this.kanjiPicker.getSelectedString();
             fetch(url).then((r) => r.text()).then((r) => {
                 if (this.gameData !== null)
                     return;
