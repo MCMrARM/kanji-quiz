@@ -197,6 +197,42 @@
             margin-top: 8px;
             cursor: pointer;
         }
+        #kanji_threshold {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 200px;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        #kanji_threshold::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            background: #00c853;
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+        }
+        #kanji_threshold::-moz-slider-thumb {
+            background: #00c853;
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+        }
+        #kanji_threshold_txt {
+            display: inline-block;
+            width: 40px;
+        }
+        .help_icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            font-size: 12px;
+            text-decoration: none;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 32px;
+        }
         a {
             color: #00C853;
         }
@@ -210,7 +246,9 @@
     <div id="options_stage">
         <div id="options_title">Kanji Reading Quiz</div>
         <p>Select the Kanji you would like in your Quiz:</p>
-        <div id="options_kanji_list" class="kanji_list"></div>
+        <div id="options_kanji_list" class="kanji_list"></div><br>
+        <label for="kanji_threshold">Compound threshold <abbr class="help_icon" title="Minimal percentage of kanji compounds that only use the Kanji from the list">?</abbr></label>
+        <input type="range" min="0" max="100" value="80" step="any" id="kanji_threshold"> <span id="kanji_threshold_txt">80%</span><br><br>
         <span id="options_start">始めよう！</span>
     </div>
     <div id="input_stage">

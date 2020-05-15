@@ -191,6 +191,8 @@ class App {
         this.domOptionsStage = document.getElementById("options_stage");
         this.domProgressText = document.getElementById("progress_text");
         this.domKanjiPicker = document.getElementById("options_kanji_list");
+        this.domKanjiThreshold = document.getElementById("kanji_threshold");
+        this.domKanjiThresholdTxt = document.getElementById("kanji_threshold_txt");
         this.domStartGame = document.getElementById("options_start");
 
         this.kanjiPickerData = new KanjiPickerData();
@@ -200,6 +202,10 @@ class App {
         this.game = null;
 
         this.domStartGame.addEventListener("click", () => this.startGame());
+        this.domKanjiThreshold.addEventListener("input", () => {
+            this.domKanjiThresholdTxt.innerText = Math.round(this.domKanjiThreshold.value) + "%";
+            this.onKanjiListUpdated();
+        });
     }
 
     load() {
@@ -213,12 +219,14 @@ class App {
         });
     }
 
+
     startGame() {
         if (this.kanjiPicker === null)
             return;
         let quizKanji = this.kanjiPicker.getSelectedString();
+        let threshold = this.domKanjiThreshold.value / 100;
         localStorage["optionsKanji"] = quizKanji;
-        let url = "api/sentences?count=20&kanji=" + quizKanji;
+        let url = "api/sentences?count=20&kanji=" + quizKanji + "&kanji_threshold=" + threshold;
 
         this.domOptionsStage.style.display = "none";
         this.domProgressText.innerText = "Getting sentences from the server...";
@@ -241,7 +249,8 @@ class App {
         }
         this.domProgressText.innerText = "Available sentences: Calculating...";
         this.kanjiCalculateTimer = setTimeout(() => {
-            let url = "api/sentences?only_count=1&kanji=" + this.kanjiPicker.getSelectedString();
+            let url = "api/sentences?only_count=1&kanji=" + this.kanjiPicker.getSelectedString() +
+                "&kanji_threshold=" + (this.domKanjiThreshold.value / 100);
             fetch(url).then((r) => r.text()).then((r) => {
                 if (this.gameData !== null)
                     return;

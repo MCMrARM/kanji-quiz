@@ -131,7 +131,10 @@ func getSentences(w http.ResponseWriter, r *http.Request) {
 		understoodKanji[kanjiId] = true
 	}
 
-	understandPMin := 1.0
+	understandThreshold, err := strconv.ParseFloat(r.FormValue("kanji_threshold")[0:], 64)
+	if err != nil {
+		understandThreshold = 1.0
+	}
 
 	filtered := make([]*Sentence, 0)
 	filteredCount := 0
@@ -149,7 +152,7 @@ func getSentences(w http.ResponseWriter, r *http.Request) {
 				compoundUnderstood = false
 			}
 		}
-		if float64(understoodCompounds) / float64(totalCompounds) < understandPMin {
+		if float64(understoodCompounds) / float64(totalCompounds) < understandThreshold {
 			continue
 		}
 		filteredCount += 1
