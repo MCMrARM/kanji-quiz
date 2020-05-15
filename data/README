@@ -1,0 +1,12 @@
+This tool uses data from several sources. In order to setup all the data required for this program to run:
+
+1. Download and process Tatoeba data
+```
+tools/download_tatoeba.sh
+python3 tools/compress_links.py
+python3 tools/make_json.py
+```
+
+
+The only file that are required to run this app on a server are: `sentences.json`, `kanji_groups.json`,
+`kanji_list.txt`.
