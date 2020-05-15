@@ -85,6 +85,7 @@ class KanaIme {
             ",": "、",
             "?": "？",
             "!": "！",
+            "-": "ー",
             "v": "ゔ"
         };
         function makeSmallLetterMappings(base, jpBase) {
