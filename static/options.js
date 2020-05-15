@@ -206,6 +206,9 @@ class App {
             this.domKanjiThresholdTxt.innerText = Math.round(this.domKanjiThreshold.value) + "%";
             this.onKanjiListUpdated();
         });
+
+        this.domKanjiThreshold.value = localStorage["optionsKanjiThreshold"] || 80;
+        this.domKanjiThresholdTxt.innerText = Math.round(this.domKanjiThreshold.value) + "%";
     }
 
     load() {
@@ -226,6 +229,7 @@ class App {
         let quizKanji = this.kanjiPicker.getSelectedString();
         let threshold = this.domKanjiThreshold.value / 100;
         localStorage["optionsKanji"] = quizKanji;
+        localStorage["optionsKanjiThreshold"] = this.domKanjiThreshold.value;
         let url = "api/sentences?count=20&kanji=" + quizKanji + "&kanji_threshold=" + threshold;
 
         this.domOptionsStage.style.display = "none";
