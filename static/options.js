@@ -216,8 +216,9 @@ class App {
     startGame() {
         if (this.kanjiPicker === null)
             return;
-        localStorage["optionsKanji"] = this.kanjiPicker.getSelectedString();
-        let url = "api/sentences?count=20&kanji=" + this.kanjiPicker.getSelectedString();
+        let quizKanji = this.kanjiPicker.getSelectedString();
+        localStorage["optionsKanji"] = quizKanji;
+        let url = "api/sentences?count=20&kanji=" + quizKanji;
 
         this.domOptionsStage.style.display = "none";
         this.domProgressText.innerText = "Getting sentences from the server...";
@@ -225,6 +226,7 @@ class App {
         this.gameData.load(url, () => {
             this.game = new Game(this.gameData);
             this.game.challengeCount = this.gameData.getSentenceCount();
+            this.game.challengeQuizKanji = quizKanji;
             this.game.challengePending = [];
             for (let i = 0; i < this.game.challengeCount; i++)
                 this.game.challengePending.push(i);

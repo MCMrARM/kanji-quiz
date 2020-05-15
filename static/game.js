@@ -16,7 +16,6 @@ class GameData {
         if (info.hasOwnProperty("jp_parsed"))
             return info;
         if (info["jp_script"] === "Hrkt") {
-            let basicReading = "";
             let kanaReading = "";
             let readingArray = [];
             let r = /(\[[^\]]*\]|[^\[]+)/g;
@@ -25,17 +24,14 @@ class GameData {
             while ((a = r.exec(s)) !== null) {
                 if (a[0].charAt(0) === '[') {
                     let readings = a[0].substr(1, a[0].length - 2).split("|");
-                    basicReading += readings[0];
                     for (let i = 1; i < readings.length; i++)
                         kanaReading += readings[i];
                     readingArray.push(readings);
                 } else {
-                    basicReading += a[0];
                     kanaReading += a[0];
                     readingArray.push([a[0]]);
                 }
             }
-            info["jp_basic"] = basicReading;
             info["jp_kana"] = this.deleteKatakana(kanaReading);
             info["jp_parsed"] = readingArray;
         }
@@ -204,6 +200,7 @@ class Game {
         this.challengeCorrectNumber = 0;
         this.challengeIncorrectNumber = 0;
         this.challengeAlreadyIncorrect = false;
+        this.challengeQuizKanji = null;
 
         this.domInputStage = document.getElementById("input_stage");
         this.domKanjiText = document.getElementById("kanji_text");
@@ -259,7 +256,8 @@ class Game {
         ++this.challengeIndex;
         this.challengeAlreadyIncorrect = false;
 
-        this.domKanjiText.innerText = this.challengeSentence["jp_basic"];
+        this.domKanjiText.innerText = "";
+        this.domKanjiText.appendChild(this.createFuriganaFor(this.challengeSentence, this.challengeQuizKanji));
         this.domProgressText.innerText = "Sentence " + (this.challengeIndex + 1) + "/" + this.challengeCount;
         this.domInput.value = "";
 
@@ -270,7 +268,7 @@ class Game {
 
     finishChallenge() {
         this.domPostSentenceJapanese.innerText = "";
-        this.domPostSentenceJapanese.appendChild(this.createFuriganaFor(this.challengeSentence));
+        this.domPostSentenceJapanese.appendChild(this.createFuriganaFor(this.challengeSentence, null));
 
         this.domPostSentenceEnglish.innerText = this.challengeSentence["en"];
 
@@ -344,11 +342,12 @@ class Game {
         }
     }
 
-    createFuriganaFor(info) {
+    createFuriganaFor(info, exclude) {
+        let excludeRegex = exclude != null ? new RegExp("^[" + exclude + "]+$") : null;
         let ret = document.createElement("span");
         let arr = info["jp_parsed"];
         for (let i = 0; i < arr.length; i++) {
-            if (arr[i].length === 1) {
+            if (arr[i].length === 1 || (excludeRegex != null && excludeRegex.test(arr[i][0]))) {
                 ret.appendChild(document.createTextNode(arr[i][0]));
             } else {
                 let ruby = document.createElement("ruby");
