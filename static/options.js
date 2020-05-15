@@ -38,6 +38,7 @@ class KanjiPicker {
             li.group = group;
             li.textContent = group["name"];
             ul.appendChild(li);
+            li.addEventListener("click", () => this.setGroup(li));
             if (firstGroupLi === null)
                 firstGroupLi = li;
         }
