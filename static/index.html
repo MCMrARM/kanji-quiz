@@ -138,6 +138,8 @@
             font-size: 12px;
             text-align: center;
             padding-bottom: 12px;
+            padding-left: 8px;
+            padding-right: 8px;
         }
         .kanji_list {
             display: flex;
@@ -275,6 +277,11 @@
                 margin-top: 40px;
             }
         }
+        @media (max-width: 480px) {
+            #kanji_threshold_label {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -286,7 +293,7 @@
         <div id="options_title">Kanji Reading Quiz</div>
         <p>Select the Kanji you would like in your Quiz:</p>
         <div id="options_kanji_list" class="kanji_list"></div><br>
-        <label for="kanji_threshold">Compound threshold <abbr class="help_icon" title="Minimal percentage of kanji compounds that only use the Kanji from the list">?</abbr></label>
+        <label for="kanji_threshold" id="kanji_threshold_label">Compound threshold <abbr class="help_icon" title="Minimal percentage of kanji compounds that only use the Kanji from the list">?</abbr></label>
         <input type="range" min="0" max="100" value="80" step="any" id="kanji_threshold"> <span id="kanji_threshold_txt">80%</span><br><br>
         <span id="options_start">始めよう！</span>
     </div>
