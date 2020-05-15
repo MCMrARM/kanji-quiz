@@ -13,6 +13,8 @@ with open("eng_sentences.tsv") as f:
 with open("jpn_transcriptions.tsv") as f:
     reader = csv.reader(f, delimiter="\t", quotechar='"')
     for row in reader:
+        if row[3] == "":
+            continue
         if row[2] not in ["Hrkt"]:
             print("Unknown transcript: " + row[2])
             continue
