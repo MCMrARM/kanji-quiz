@@ -230,12 +230,17 @@ class App {
         let threshold = this.domKanjiThreshold.value / 100;
         localStorage["optionsKanji"] = quizKanji;
         localStorage["optionsKanjiThreshold"] = this.domKanjiThreshold.value;
-        let url = "api/sentences?count=20&kanji=" + quizKanji + "&kanji_threshold=" + threshold;
 
         this.domOptionsStage.style.display = "none";
         this.domProgressText.innerText = "Getting sentences from the server...";
         this.gameData = new GameData();
-        this.gameData.load(url, () => {
+        this.gameData.load("api/sentences", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: "count=20&kanji=" + quizKanji + "&kanji_threshold=" + threshold
+        }, () => {
             this.game = new Game(this.gameData);
             this.game.challengeCount = this.gameData.getSentenceCount();
             this.game.challengeQuizKanji = quizKanji;
@@ -253,9 +258,15 @@ class App {
         }
         this.domProgressText.innerText = "Available sentences: Calculating...";
         this.kanjiCalculateTimer = setTimeout(() => {
-            let url = "api/sentences?only_count=1&kanji=" + this.kanjiPicker.getSelectedString() +
+            let opts  = "only_count=1&kanji=" + this.kanjiPicker.getSelectedString() +
                 "&kanji_threshold=" + (this.domKanjiThreshold.value / 100);
-            fetch(url).then((r) => r.text()).then((r) => {
+            fetch("api/sentences", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: opts
+            }).then((r) => r.text()).then((r) => {
                 if (this.gameData !== null)
                     return;
                 this.domProgressText.innerText = "Available sentences: " + r.trim();

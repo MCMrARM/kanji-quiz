@@ -1,7 +1,7 @@
 class GameData {
 
-    load(path, callback) {
-        fetch(path).then((r) => r.json()).then((r) => {
+    load(path, opts, callback) {
+        fetch(path, opts).then((r) => r.json()).then((r) => {
             this.sentences = r;
             callback();
         });
