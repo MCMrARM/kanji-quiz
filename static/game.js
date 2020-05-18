@@ -94,6 +94,7 @@ class KanaIme {
         makeSmallLetterMappings("ky", "き");
         makeSmallLetterMappings("gy", "ぎ");
         makeSmallLetterMappings("sh", "し");
+        makeSmallLetterMappings("sy", "し");
         makeSmallLetterMappings("ch", "ち");
         makeSmallLetterMappings("ny", "に");
         makeSmallLetterMappings("んy", "に");
